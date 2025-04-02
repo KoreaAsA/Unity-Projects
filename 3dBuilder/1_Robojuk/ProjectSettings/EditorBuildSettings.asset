@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/PlayerCountChoose.unity
+    guid: 1f2527ee9f875c44990addc9bdf5bc4a
+  - enabled: 0
+    path: Assets/Scenes/Menu.unity
+    guid: c41e8914d51c60546bf662b8d81c9d7c
+  - enabled: 1
+    path: Assets/Scenes/1_Robojuk.unity
+    guid: 84ec4ca5fa3ac4b4284c559320a3bd51
+  - enabled: 0
+    path: Assets/Scenes/2_avto.unity
+    guid: 52b1fe91713736a4c88ebfd7dbaafb86
+  - enabled: 0
+    path: Assets/Scenes/3_Robik.unity
+    guid: c7c4aee6db82a3841bffb1d1ef919411
+  - enabled: 0
+    path: Assets/Scenes/4_MiniAvto.unity
+    guid: a3b30f80d1e93ad438854d32ba258e24
+  - enabled: 0
+    path: Assets/Scenes/8_FootballRobot.unity
+    guid: 5b191fe493672e74aa6ee0991e75a7b2
+  - enabled: 0
+    path: Assets/Scenes/9_Sportcar.unity
+    guid: 9e962a10546c2c445b479522d5f07aa6
+  - enabled: 1
+    path: Assets/MarksAssets/FullscreenWebGL/Example/FullscreenWebGL.unity
+    guid: a05416230f1461b42b36c84fdf5ba0cf
+  m_configObjects: {}
