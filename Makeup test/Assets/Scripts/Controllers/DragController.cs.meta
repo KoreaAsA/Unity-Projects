@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5c2e91d2ab69f0147ae3503ab55c4a76
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - dragStart: {fileID: -7384545050061387935, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  - drag: {fileID: 6491558587463734635, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  - dragEnd: {fileID: -886352708583816752, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
