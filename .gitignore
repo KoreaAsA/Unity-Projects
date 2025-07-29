@@ -75,3 +75,6 @@ crashlytics-build.properties
 
 # Gradle cache directory
 .gradle/
+Jelly Fall/
+NoCtrl/
+TetrisBalls/
