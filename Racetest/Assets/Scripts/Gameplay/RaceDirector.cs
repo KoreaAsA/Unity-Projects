@@ -17,12 +17,13 @@ public sealed class RaceDirector : MonoBehaviour
     private GameObject _ghostCar;
     private Coroutine _raceFlowCoroutine;
 
-    // ИЗМЕНЕНИЕ: Убираем локальный флаг, используем статический
     public static bool IsFirstRace { get; private set; } = true;
 
     private void Start()
     {
-        // Устанавливаем начальное состояние
+        Debug.Log("[RaceDirector] Starting race director...");
+        ValidateComponents();
+
         if (RaceStateMachine.Instance != null)
         {
             RaceStateMachine.Instance.ChangeState(RaceState.Idle);
@@ -35,14 +36,12 @@ public sealed class RaceDirector : MonoBehaviour
 
     private void OnEnable()
     {
-        // Подписываемся на события UI
         if (_raceUI != null)
         {
             _raceUI.OnStartClicked += StartRace;
             _raceUI.OnRetryClicked += RestartRace;
         }
 
-        // Подписываемся на сигнал завершения гонки
         if (_raceFinishedSignal != null)
         {
             _raceFinishedSignal.AddListener(OnLapCompleted);
@@ -53,20 +52,35 @@ public sealed class RaceDirector : MonoBehaviour
 
     private void OnDisable()
     {
-        // Отписываемся от событий UI
         if (_raceUI != null)
         {
             _raceUI.OnStartClicked -= StartRace;
             _raceUI.OnRetryClicked -= RestartRace;
         }
 
-        // Отписываемся от сигнала завершения гонки
         if (_raceFinishedSignal != null)
         {
             _raceFinishedSignal.RemoveListener(OnLapCompleted);
         }
 
         Debug.Log("[RaceDirector] Event unsubscriptions completed");
+    }
+
+    private void ValidateComponents()
+    {
+        bool allValid = true;
+
+        if (_spawnManager == null) { Debug.LogError("[RaceDirector] SpawnManager not assigned!"); allValid = false; }
+        if (_trackStorage == null) { Debug.LogError("[RaceDirector] GhostTrackStorage not assigned!"); allValid = false; }
+        if (_raceUI == null) { Debug.LogError("[RaceDirector] RaceUI not assigned!"); allValid = false; }
+        if (_raceStartedSignal == null) { Debug.LogError("[RaceDirector] RaceStartedSignal not assigned!"); allValid = false; }
+        if (_raceFinishedSignal == null) { Debug.LogError("[RaceDirector] RaceFinishedSignal not assigned!"); allValid = false; }
+        if (_countdownFinishedSignal == null) { Debug.LogError("[RaceDirector] CountdownFinishedSignal not assigned!"); allValid = false; }
+
+        if (allValid)
+        {
+            Debug.Log("[RaceDirector] All components validated successfully");
+        }
     }
 
     private void StartRace()
@@ -92,20 +106,14 @@ public sealed class RaceDirector : MonoBehaviour
     {
         Debug.Log("[RaceDirector] RestartRace called");
 
-        // Останавливаем текущую гонку если она идет
         if (_raceFlowCoroutine != null)
         {
             StopCoroutine(_raceFlowCoroutine);
             _raceFlowCoroutine = null;
         }
 
-        // Очищаем машины
         CleanupVehicles();
-
-        // ИЗМЕНЕНИЕ: Устанавливаем флаг через статическое свойство
-        IsFirstRace = false;
-
-        // Возвращаемся в состояние Idle
+        //IsFirstRace = false; // ИЗМЕНЕНИЕ: Устанавливаем что это уже не первая гонка
         RaceStateMachine.Instance.ChangeState(RaceState.Idle);
     }
 
@@ -113,7 +121,7 @@ public sealed class RaceDirector : MonoBehaviour
     {
         Debug.Log("[RaceDirector] Starting race flow...");
 
-        // 1. Setup Phase - спавним машины и сразу начинаем запись
+        // 1. Setup Phase
         Debug.Log("[RaceDirector] Phase 1: Setup vehicles");
         bool setupSuccess = SetupRace();
         if (!setupSuccess)
@@ -124,12 +132,10 @@ public sealed class RaceDirector : MonoBehaviour
             yield break;
         }
 
-        // ИЗМЕНЕНИЕ: Убираем отсчет, сразу переходим к гонке
+        // 2. Start racing immediately
         Debug.Log("[RaceDirector] Phase 2: Starting race immediately");
         RaceStateMachine.Instance.ChangeState(RaceState.Racing);
 
-        // ИЗМЕНЕНИЕ: Сразу включаем управление и начинаем запись
-        SetPlayerControlEnabled(true);
         _raceStartedSignal.Raise();
         Debug.Log("[RaceDirector] Race started signal raised immediately");
 
@@ -143,7 +149,7 @@ public sealed class RaceDirector : MonoBehaviour
 
     private bool SetupRace()
     {
-        // Сохраняем данные призрака перед очисткой
+        // Сохраняем данные призрака
         var ghostData = new VehicleSnapshot[_trackStorage.Frames.Count];
         for (int i = 0; i < _trackStorage.Frames.Count; i++)
         {
@@ -151,8 +157,8 @@ public sealed class RaceDirector : MonoBehaviour
         }
         bool hasGhostData = ghostData.Length > 0;
 
-        // Спавним игрока
-        _playerCar = _spawnManager.SpawnPlayer();
+        // ИЗМЕНЕНИЕ: Спавним игрока с учетом первого заезда
+        _playerCar = _spawnManager.SpawnPlayer(IsFirstRace);
         if (_playerCar == null)
         {
             Debug.LogError("[RaceDirector] Failed to spawn player car!");
@@ -170,7 +176,7 @@ public sealed class RaceDirector : MonoBehaviour
         recorder.enabled = true;
         Debug.Log("[RaceDirector] Player recorder enabled");
 
-        // ИЗМЕНЕНИЕ: Спавним призрака только если есть данные И это не первая гонка
+        // Спавним призрака только если есть данные И это не первая гонка
         if (hasGhostData && !IsFirstRace)
         {
             Debug.Log($"[RaceDirector] Spawning ghost with {ghostData.Length} frames");
@@ -181,10 +187,10 @@ public sealed class RaceDirector : MonoBehaviour
                 return false;
             }
 
-            var ghost = _ghostCar.GetComponent<GhostDriver>();
+            var ghost = _ghostCar.GetComponent<SmoothedGhostDriver>();
             if (ghost == null)
             {
-                Debug.LogError("[RaceDirector] Ghost car missing GhostDriver component!");
+                Debug.LogError("[RaceDirector] Ghost car missing SmoothedGhostDriver component!");
                 return false;
             }
 
@@ -193,7 +199,7 @@ public sealed class RaceDirector : MonoBehaviour
         }
         else if (IsFirstRace)
         {
-            Debug.Log("[RaceDirector] First race - no ghost spawned");
+            Debug.Log("[RaceDirector] First race - no ghost spawned, player at ghost spawn");
         }
         else
         {
@@ -203,26 +209,15 @@ public sealed class RaceDirector : MonoBehaviour
         return true;
     }
 
-    private void SetPlayerControlEnabled(bool enabled)
-    {
-        if (_playerCar == null) return;
-
-        // Пытаемся найти компонент управления по разным возможным именам
-        var carController = _playerCar.GetComponent<MonoBehaviour>();
-
-        // Здесь нужно адаптировать под ваш конкретный компонент управления
-        // Например, если у вас есть CarController, то:
-        // var carController = _playerCar.GetComponent<CarController>();
-        // if (carController != null) carController.enabled = enabled;
-
-        Debug.Log($"[RaceDirector] Player control {(enabled ? "enabled" : "disabled")}");
-    }
-
     private void OnLapCompleted(float lapTime)
     {
         Debug.Log($"[RaceDirector] Lap completed in {lapTime:F2} seconds");
 
-        // Сохраняем траекторию игрока в storage для следующего заезда
+        if (IsFirstRace)
+        {
+            IsFirstRace = false;
+            Debug.Log("[RaceDirector] First race completed, subsequent races will have ghost");
+        }
         if (_playerCar != null)
         {
             var recorder = _playerCar.GetComponent<Recorder>();
@@ -242,7 +237,6 @@ public sealed class RaceDirector : MonoBehaviour
         RaceStateMachine.Instance.ChangeState(RaceState.Finished);
         _raceUI.ShowResult(lapTime);
 
-        // Очищаем машины после небольшой задержки
         StartCoroutine(DelayedCleanup());
     }
 
@@ -258,7 +252,7 @@ public sealed class RaceDirector : MonoBehaviour
         {
             Debug.Log("[RaceDirector] Destroying player car");
             Destroy(_playerCar);
-            _playerCar = null;  
+            _playerCar = null;
         }
 
         if (_ghostCar != null)

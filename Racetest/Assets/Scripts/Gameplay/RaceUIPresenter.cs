@@ -5,18 +5,13 @@ public sealed class RaceUIPresenter : MonoBehaviour
 {
     [SerializeField] private RaceUI _ui;
 
-    // ИЗМЕНЕНИЕ: Добавляем флаг для отслеживания первой гонки
-    private bool _isFirstRace = true;
-
     private void Start()
     {
-        // Используем Start вместо OnEnable для гарантии что Bootstrap уже выполнился
         StartCoroutine(WaitForStateMachineAndInitialize());
     }
 
     private IEnumerator WaitForStateMachineAndInitialize()
     {
-        // Ждем пока RaceStateMachine не будет создан
         while (RaceStateMachine.Instance == null)
         {
             Debug.Log("[RaceUIPresenter] Waiting for RaceStateMachine to be created...");
@@ -25,21 +20,18 @@ public sealed class RaceUIPresenter : MonoBehaviour
 
         Debug.Log("[RaceUIPresenter] RaceStateMachine found, initializing UI presenter");
 
-        // Проверяем что UI назначен
         if (_ui == null)
         {
             Debug.LogError("[RaceUIPresenter] RaceUI component not assigned!");
             yield break;
         }
 
-        // Подписываемся на изменения состояния
         var stateMachine = RaceStateMachine.Instance;
         stateMachine.OnStateChanged += OnStateChanged;
 
-        // ИЗМЕНЕНИЕ: Подписываемся на события UI для отслеживания retry
+        // ИЗМЕНЕНИЕ: Убираем локальный флаг, используем статический из RaceDirector
         _ui.OnRetryClicked += OnRetryClicked;
 
-        // Показываем текущее состояние сразу
         OnStateChanged(stateMachine.Current);
 
         Debug.Log($"[RaceUIPresenter] Initialized successfully. Current state: {stateMachine.Current}");
@@ -47,7 +39,6 @@ public sealed class RaceUIPresenter : MonoBehaviour
 
     private void OnEnable()
     {
-        // Если StateMachine уже существует, подписываемся сразу
         if (RaceStateMachine.Instance != null)
         {
             Debug.Log("[RaceUIPresenter] StateMachine available in OnEnable, subscribing immediately");
@@ -58,13 +49,11 @@ public sealed class RaceUIPresenter : MonoBehaviour
 
     private void OnDisable()
     {
-        // Отписываемся только если Instance не null
         if (RaceStateMachine.Instance != null)
         {
             RaceStateMachine.Instance.OnStateChanged -= OnStateChanged;
         }
 
-        // ИЗМЕНЕНИЕ: Отписываемся от UI событий
         if (_ui != null)
         {
             _ui.OnRetryClicked -= OnRetryClicked;
@@ -73,11 +62,9 @@ public sealed class RaceUIPresenter : MonoBehaviour
         Debug.Log("[RaceUIPresenter] Unsubscribed from state changes");
     }
 
-    // НОВЫЙ МЕТОД: Обработка нажатия Retry
     private void OnRetryClicked()
     {
-        _isFirstRace = false;
-        Debug.Log("[RaceUIPresenter] Retry clicked - subsequent race");
+        Debug.Log("[RaceUIPresenter] Retry clicked - will be subsequent race");
     }
 
     private void OnStateChanged(RaceState state)
@@ -88,19 +75,19 @@ public sealed class RaceUIPresenter : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[RaceUIPresenter] Handling state change: {state} (FirstRace: {_isFirstRace})");
+        // ИЗМЕНЕНИЕ: Используем статический флаг из RaceDirector
+        Debug.Log($"[RaceUIPresenter] Handling state change: {state} (FirstRace: {RaceDirector.IsFirstRace})");
 
         switch (state)
         {
             case RaceState.Idle:
-                // ИЗМЕНЕНИЕ: Показываем разный UI в зависимости от того, первая это гонка или нет
-                if (_isFirstRace)
+                if (RaceDirector.IsFirstRace)
                 {
                     _ui.ShowIdle(); // Показываем кнопку "Start"
                 }
                 else
                 {
-                    _ui.ShowRetryOnly(); // Показываем только кнопку "Retry"
+                    _ui.ShowIdle(); // Показываем только кнопку "Retry"
                 }
                 break;
 
@@ -113,7 +100,6 @@ public sealed class RaceUIPresenter : MonoBehaviour
                 break;
 
             case RaceState.Finished:
-                // Результат покажет RaceFinishedSignal через RaceDirector
                 Debug.Log("[RaceUIPresenter] Race finished - result will be shown by RaceDirector");
                 break;
 
