@@ -21,6 +21,9 @@ public sealed class RaceDirector : MonoBehaviour
 
     private void Start()
     {
+
+        IsFirstRace = true;
+
         Debug.Log("[RaceDirector] Starting race director...");
         ValidateComponents();
 
