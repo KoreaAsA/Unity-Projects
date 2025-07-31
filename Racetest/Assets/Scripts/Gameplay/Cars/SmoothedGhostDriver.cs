@@ -157,7 +157,7 @@ public sealed class SmoothedGhostDriver : MonoBehaviour, IPlayback
 
     private void FollowTrajectory()
     {
-        float elapsed = (Time.time - _startTime) * _speed;
+        float elapsed = (Time.fixedTime - _startTime) * _speed;
 
         // Находим нужный кадр в траектории
         while (_currentIndex < _trajectory.Length - 1 && _trajectory[_currentIndex + 1].Time <= elapsed)
