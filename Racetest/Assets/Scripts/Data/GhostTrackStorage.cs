@@ -4,7 +4,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Race/GhostTrackStorage")]
 public sealed class GhostTrackStorage : ScriptableObject
 {
-    private readonly List<VehicleSnapshot> _frames = new();
+    [SerializeField]
+    private List<VehicleSnapshot> _frames = new();
+
     public IReadOnlyList<VehicleSnapshot> Frames => _frames;
 
     public void Clear() => _frames.Clear();
