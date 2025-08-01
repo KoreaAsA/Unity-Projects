@@ -1721,8 +1721,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 090c1fa5431bad849bf3f7c3d437d472, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _raceStartedSignal: {fileID: 11400000, guid: 6130f42b75e09414993f1f9a6d3489f7, type: 2}
-  _raceFinishedSignal: {fileID: 11400000, guid: def4367ce7e70804dba98ac12d81ca3c, type: 2}
+  _raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
+  _raceFinishedSignal: {fileID: 11400000, guid: 7b121c45f1f811448a1201ca7143deb1, type: 2}
 --- !u!65 &813982899202212528
 BoxCollider:
   m_ObjectHideFlags: 0

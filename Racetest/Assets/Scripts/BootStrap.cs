@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
-/// WebGL-адаптированный Bootstrap с улучшенным логированием
+/// Исправленный Bootstrap с правильной инициализацией логгера
 /// </summary>
 public sealed class Bootstrap : MonoBehaviour
 {
@@ -14,16 +14,12 @@ public sealed class Bootstrap : MonoBehaviour
     [SerializeField] private bool _enableWebGLOptimizations = true;
     [SerializeField] private int _targetFrameRate = 60;
 
-    [Header("Execution Order")]
-    [SerializeField] private int _executionOrder = -100;
-
     private void Awake()
     {
-        // Инициализируем логгер в первую очередь
-        var logger = WebGLDebugLogger.Instance;
 
-        WebGLDebugLogger.Log("Starting game initialization...", LogType.Log, "Bootstrap");
-        WebGLDebugLogger.SetSystemState("Bootstrap", true);
+        // Теперь безопасно используем логгер
+        SafeLog("Starting game initialization...", LogType.Log, "Bootstrap");
+        SafeSetSystemState("Bootstrap", true);
 
         // WebGL оптимизации
         if (_enableWebGLOptimizations)
@@ -46,21 +42,21 @@ public sealed class Bootstrap : MonoBehaviour
         // Устанавливаем оптимальные настройки для WebGL
         Time.fixedDeltaTime = 1f / 50f; // 50 Hz для физики
 
-        WebGLDebugLogger.Log("WebGL optimizations applied", LogType.Log, "Bootstrap");
-        WebGLDebugLogger.SetSystemValue("TargetFPS", _targetFrameRate.ToString());
+        SafeLog("WebGL optimizations applied", LogType.Log, "Bootstrap");
+        SafeSetSystemValue("TargetFPS", _targetFrameRate.ToString());
     }
 
-    private IEnumerator InitializeStateMachine()
+    private System.Collections.IEnumerator InitializeStateMachine()
     {
         // Даем кадр на инициализацию других систем
         yield return null;
 
-        WebGLDebugLogger.Log("Initializing RaceStateMachine...", LogType.Log, "Bootstrap");
+        SafeLog("Initializing RaceStateMachine...", LogType.Log, "Bootstrap");
 
         // Создаём RaceStateMachine, если его ещё нет
         if (RaceStateMachine.Instance == null)
         {
-            WebGLDebugLogger.Log("Creating new RaceStateMachine instance", LogType.Log, "Bootstrap");
+            SafeLog("Creating new RaceStateMachine instance", LogType.Log, "Bootstrap");
 
             var rsmObject = new GameObject("RaceStateMachine");
             var rsm = rsmObject.AddComponent<RaceStateMachine>();
@@ -68,13 +64,13 @@ public sealed class Bootstrap : MonoBehaviour
             // Убедимся что объект не уничтожится при загрузке новой сцены
             DontDestroyOnLoad(rsmObject);
 
-            WebGLDebugLogger.Log("RaceStateMachine created successfully", LogType.Log, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("RaceStateMachine", true);
+            SafeLog("RaceStateMachine created successfully", LogType.Log, "Bootstrap");
+            SafeSetSystemState("RaceStateMachine", true);
         }
         else
         {
-            WebGLDebugLogger.Log("RaceStateMachine already exists", LogType.Warning, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("RaceStateMachine", true);
+            SafeLog("RaceStateMachine already exists", LogType.Warning, "Bootstrap");
+            SafeSetSystemState("RaceStateMachine", true);
         }
 
         // Ждем еще кадр для полной инициализации
@@ -83,25 +79,25 @@ public sealed class Bootstrap : MonoBehaviour
         // Проверяем что Instance действительно доступен
         if (RaceStateMachine.Instance == null)
         {
-            WebGLDebugLogger.Log("RaceStateMachine.Instance is still null after creation!", LogType.Error, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("RaceStateMachine", false);
+            SafeLog("RaceStateMachine.Instance is still null after creation!", LogType.Error, "Bootstrap");
+            SafeSetSystemState("RaceStateMachine", false);
             yield break;
         }
 
         // Устанавливаем начальное состояние
         RaceStateMachine.Instance.ChangeState(RaceState.Idle);
-        WebGLDebugLogger.LogStateTransition("None", "Idle", "Bootstrap");
+        SafeLogStateTransition("None", "Idle", "Bootstrap");
 
         // Валидируем сигналы
         yield return StartCoroutine(ValidateSignalsCoroutine());
 
-        WebGLDebugLogger.Log("Game systems initialized successfully", LogType.Log, "Bootstrap");
-        WebGLDebugLogger.SetSystemState("GameInitialized", true);
+        SafeLog("Game systems initialized successfully", LogType.Log, "Bootstrap");
+        SafeSetSystemState("GameInitialized", true);
     }
 
-    private IEnumerator ValidateSignalsCoroutine()
+    private System.Collections.IEnumerator ValidateSignalsCoroutine()
     {
-        WebGLDebugLogger.Log("Starting signal validation...", LogType.Log, "Bootstrap");
+        SafeLog("Starting signal validation...", LogType.Log, "Bootstrap");
 
         yield return null; // Даем кадр для WebGL
 
@@ -110,57 +106,111 @@ public sealed class Bootstrap : MonoBehaviour
         // Проверяем RaceStartedSignal
         if (_raceStartedSignal == null)
         {
-            WebGLDebugLogger.Log("RaceStartedSignal not assigned!", LogType.Error, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("RaceStartedSignal", false);
+            SafeLog("RaceStartedSignal not assigned!", LogType.Error, "Bootstrap");
+            SafeSetSystemState("RaceStartedSignal", false);
             allValid = false;
         }
         else
         {
-            WebGLDebugLogger.SetSystemState("RaceStartedSignal", true);
+            SafeSetSystemState("RaceStartedSignal", true);
         }
 
         // Проверяем RaceFinishedSignal
         if (_raceFinishedSignal == null)
         {
-            WebGLDebugLogger.Log("RaceFinishedSignal not assigned!", LogType.Error, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("RaceFinishedSignal", false);
+            SafeLog("RaceFinishedSignal not assigned!", LogType.Error, "Bootstrap");
+            SafeSetSystemState("RaceFinishedSignal", false);
             allValid = false;
         }
         else
         {
-            WebGLDebugLogger.SetSystemState("RaceFinishedSignal", true);
+            SafeSetSystemState("RaceFinishedSignal", true);
         }
 
         // Проверяем CountdownFinishedSignal
         if (_countdownFinishedSignal == null)
         {
-            WebGLDebugLogger.Log("CountdownFinishedSignal not assigned!", LogType.Error, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("CountdownFinishedSignal", false);
+            SafeLog("CountdownFinishedSignal not assigned!", LogType.Error, "Bootstrap");
+            SafeSetSystemState("CountdownFinishedSignal", false);
             allValid = false;
         }
         else
         {
-            WebGLDebugLogger.SetSystemState("CountdownFinishedSignal", true);
+            SafeSetSystemState("CountdownFinishedSignal", true);
         }
 
         if (allValid)
         {
-            WebGLDebugLogger.Log("All signals validated successfully", LogType.Log, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("SignalsValidated", true);
+            SafeLog("All signals validated successfully", LogType.Log, "Bootstrap");
+            SafeSetSystemState("SignalsValidated", true);
         }
         else
         {
-            WebGLDebugLogger.Log("Some signals are missing - create them via Create menu", LogType.Warning, "Bootstrap");
-            WebGLDebugLogger.SetSystemState("SignalsValidated", false);
+            SafeLog("Some signals are missing - create them via Create menu", LogType.Warning, "Bootstrap");
+            SafeSetSystemState("SignalsValidated", false);
         }
 
-        WebGLDebugLogger.SetSystemValue("ValidatedSignals", $"{(allValid ? "All" : "Some missing")}");
+        SafeSetSystemValue("ValidatedSignals", $"{(allValid ? "All" : "Some missing")}");
+    }
+
+    private void SafeLog(string message, LogType type = LogType.Log, string category = "General")
+    {
+        try
+        {
+            WebGLDebugLogger.Log(message, type, category);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log($"[{category}] {message} (Logger unavailable: {ex.Message})");
+        }
+    }
+
+    private void SafeSetSystemState(string key, bool value)
+    {
+        try
+        {
+            WebGLDebugLogger.SetSystemState(key, value);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Logger SetSystemState error: {ex.Message}");
+        }
+    }
+
+    private void SafeSetSystemValue(string key, string value)
+    {
+        try
+        {
+            if (WebGLDebugLogger.Instance != null)
+            {
+                WebGLDebugLogger.SetSystemValue(key, value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Logger SetSystemValue error: {ex.Message}");
+        }
+    }
+
+    private void SafeLogStateTransition(string from, string to, string system = "StateMachine")
+    {
+        try
+        {
+            if (WebGLDebugLogger.Instance != null)
+            {
+                WebGLDebugLogger.LogStateTransition(from, to, system);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Logger LogStateTransition error: {ex.Message}");
+        }
     }
 
     private void OnDestroy()
     {
-        WebGLDebugLogger.Log("Bootstrap destroyed", LogType.Log, "Bootstrap");
-        WebGLDebugLogger.SetSystemState("Bootstrap", false);
+        SafeLog("Bootstrap destroyed", LogType.Log, "Bootstrap");
+        SafeSetSystemState("Bootstrap", false);
     }
 
     // WebGL-совместимый метод для проверки производительности
@@ -170,12 +220,12 @@ public sealed class Bootstrap : MonoBehaviour
         if (Time.frameCount % 60 == 0) // Каждые 60 кадров
         {
             float fps = 1f / Time.unscaledDeltaTime;
-            WebGLDebugLogger.SetSystemValue("CurrentFPS", Mathf.RoundToInt(fps).ToString());
+            SafeSetSystemValue("CurrentFPS", Mathf.RoundToInt(fps).ToString());
 
             // Предупреждаем о низком FPS
             if (fps < _targetFrameRate * 0.8f)
             {
-                WebGLDebugLogger.Log($"Low FPS detected: {fps:F1}", LogType.Warning, "Performance");
+                SafeLog($"Low FPS detected: {fps:F1}", LogType.Warning, "Performance");
             }
         }
     }

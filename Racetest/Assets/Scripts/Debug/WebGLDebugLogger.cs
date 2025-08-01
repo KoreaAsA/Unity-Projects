@@ -18,17 +18,25 @@ public sealed class WebGLDebugLogger : MonoBehaviour
     {
         get
         {
+            // Сначала ищем существующий в сцене
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<WebGLDebugLogger>();
+            }
+
+            // Только если не нашли - создаем новый
             if (_instance == null)
             {
                 var go = new GameObject("[WebGL Debug Logger]");
                 _instance = go.AddComponent<WebGLDebugLogger>();
                 DontDestroyOnLoad(go);
+                Debug.Log("[WebGLDebugLogger] Created new instance automatically");
             }
+
             return _instance;
         }
     }
 
-    // Структура для логов
     [System.Serializable]
     public struct LogEntry
     {
@@ -66,10 +74,23 @@ public sealed class WebGLDebugLogger : MonoBehaviour
             _instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeWebGLCompatible();
+            gameObject.name = "[WebGL Debug Logger - Active]";
+            Debug.Log($"[WebGLDebugLogger] Initialized successfully on GameObject: {gameObject.name}");
         }
         else if (_instance != this)
         {
+            Debug.LogWarning($"[WebGLDebugLogger] Destroying duplicate instance on {gameObject.name}");
             Destroy(gameObject);
+            return;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+        {
+            Debug.Log("[WebGLDebugLogger] Active instance destroyed, clearing static reference");
+            _instance = null;
         }
     }
 

@@ -22,9 +22,25 @@ public sealed class RaceUI : MonoBehaviour
     public event System.Action OnStartClicked;
     public event System.Action OnRetryClicked;
 
+    [ContextMenu("Check Logger")]
+    void CheckLogger()
+    {
+        var logger = FindObjectOfType<WebGLDebugLogger>();
+        Debug.Log($"Logger in scene: {logger != null}");
+        Debug.Log($"Logger instance: {WebGLDebugLogger.Instance != null}");
+
+        if (logger != null)
+        {
+            Debug.Log($"Logger GameObject: {logger.gameObject.name}");
+            Debug.Log($"DontDestroyOnLoad: {logger.gameObject.scene.name}");
+        }
+    }
 
     private void Start()
     {
+
+        CheckLogger(); 
+
         _idlePanel.SetActive(true);
         _racePanel.SetActive(false);
         _resultPanel.SetActive(false);

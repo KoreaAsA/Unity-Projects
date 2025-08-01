@@ -599,14 +599,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 1
-  _raceStartedSignal: {fileID: 11400000, guid: 6130f42b75e09414993f1f9a6d3489f7, type: 2}
-  _recoverySpeed: 5
-  _maxRecoveryDistance: 20
-  _obstacleLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  _raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
   _smoothingFactor: 0.1
-  _lookAheadFrames: 5
 --- !u!1 &5707563393392022948
 GameObject:
   m_ObjectHideFlags: 0

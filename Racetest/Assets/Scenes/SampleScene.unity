@@ -906,8 +906,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3b50fcceaad27418022ae655f54e85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _raceStartedSignal: {fileID: 11400000, guid: 6130f42b75e09414993f1f9a6d3489f7, type: 2}
-  _raceFinishedSignal: {fileID: 11400000, guid: def4367ce7e70804dba98ac12d81ca3c, type: 2}
+  _raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
+  _raceFinishedSignal: {fileID: 11400000, guid: 7b121c45f1f811448a1201ca7143deb1, type: 2}
 --- !u!4 &185568622 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9033667457974732565, guid: 8f86d61ddfee40249b312b37057d6eb4, type: 3}
@@ -2966,6 +2966,53 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f86d61ddfee40249b312b37057d6eb4, type: 3}
+--- !u!1 &626048703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 626048704}
+  - component: {fileID: 626048705}
+  m_Layer: 0
+  m_Name: RaceControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &626048704
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626048703}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 293.6629, y: 35.40006, z: 476.84183}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &626048705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626048703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef30df22bb671ae4db510f83eeac0f06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
+  raceFinishedSignal: {fileID: 11400000, guid: 7b121c45f1f811448a1201ca7143deb1, type: 2}
+  countdownSignal: {fileID: 11400000, guid: 3542214e86dce8040864e92e3180ab9c, type: 2}
 --- !u!1 &664736730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,10 +3082,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9bc12a5c19ea84a824f9cbdc4e900e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _raceStartedSignal: {fileID: 11400000, guid: 6130f42b75e09414993f1f9a6d3489f7, type: 2}
-  _raceFinishedSignal: {fileID: 11400000, guid: def4367ce7e70804dba98ac12d81ca3c, type: 2}
-  _countdownFinishedSignal: {fileID: 11400000, guid: fd8ebbe37d2440d4aad256737d522f4c, type: 2}
-  _executionOrder: -100
+  _raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
+  _raceFinishedSignal: {fileID: 11400000, guid: 7b121c45f1f811448a1201ca7143deb1, type: 2}
+  _countdownFinishedSignal: {fileID: 11400000, guid: 3542214e86dce8040864e92e3180ab9c, type: 2}
+  _enableWebGLOptimizations: 1
+  _targetFrameRate: 60
+  _createLoggerIfMissing: 1
 --- !u!4 &670553966
 Transform:
   m_ObjectHideFlags: 0
@@ -6729,9 +6778,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a124308f17670494685ae71e53015cfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _countdownFinishedSignal: {fileID: 11400000, guid: fd8ebbe37d2440d4aad256737d522f4c, type: 2}
-  _raceStartedSignal: {fileID: 11400000, guid: 6130f42b75e09414993f1f9a6d3489f7, type: 2}
-  _raceFinishedSignal: {fileID: 11400000, guid: def4367ce7e70804dba98ac12d81ca3c, type: 2}
+  _countdownFinishedSignal: {fileID: 11400000, guid: 3542214e86dce8040864e92e3180ab9c, type: 2}
+  _raceStartedSignal: {fileID: 11400000, guid: 24150b2f5360cc141a09650119195de8, type: 2}
+  _raceFinishedSignal: {fileID: 11400000, guid: 7b121c45f1f811448a1201ca7143deb1, type: 2}
   _spawnManager: {fileID: 378785836}
   _trackStorage: {fileID: 11400000, guid: 75d40443270c8344792bfcee184c640b, type: 2}
   _raceUI: {fileID: 1286970055}
@@ -9193,3 +9242,4 @@ SceneRoots:
   - {fileID: 664736731}
   - {fileID: 670553966}
   - {fileID: 1297363059}
+  - {fileID: 626048704}
