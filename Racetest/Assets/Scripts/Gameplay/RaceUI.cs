@@ -22,8 +22,21 @@ public sealed class RaceUI : MonoBehaviour
     public event System.Action OnStartClicked;
     public event System.Action OnRetryClicked;
 
+
+    private void Start()
+    {
+        _idlePanel.SetActive(true);
+        _racePanel.SetActive(false);
+        _resultPanel.SetActive(false);
+    }
+
     private void Awake()
     {
+
+        _idlePanel.SetActive(true);
+        _racePanel.SetActive(true);
+        _resultPanel.SetActive(true);
+
         // Подписываемся на кнопки
         if (_startButton != null)
         {
