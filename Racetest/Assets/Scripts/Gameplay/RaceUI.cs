@@ -79,11 +79,11 @@ public sealed class RaceUI : MonoBehaviour
         SetPanelStates(idle: true, race: false, result: false);
         SetCountdownVisible(false);
 
-        // ИЗМЕНЕНИЕ: В первой гонке показываем кнопку Start, скрываем Retry
+        // В первой гонке показываем кнопку Start, скрываем Retry
         SetButtonStates(showStart: true, showRetry: false);
     }
 
-    // НОВЫЙ МЕТОД: Показать только кнопку Retry (для последующих гонок)
+    // Показать только кнопку Retry (для последующих гонок)
     public void ShowRetryOnly()
     {
         Debug.Log("[RaceUI] Showing Retry only panel (subsequent race)");
@@ -100,7 +100,7 @@ public sealed class RaceUI : MonoBehaviour
         SetPanelStates(idle: false, race: true, result: false);
         SetCountdownVisible(true);
 
-        // ИЗМЕНЕНИЕ: Во время отсчета скрываем все кнопки
+        // Во время отсчета скрываем все кнопки
         SetButtonStates(showStart: false, showRetry: false);
     }
 
@@ -110,7 +110,7 @@ public sealed class RaceUI : MonoBehaviour
         SetPanelStates(idle: false, race: true, result: false);
         SetCountdownVisible(false);
 
-        // ИЗМЕНЕНИЕ: Во время гонки скрываем все кнопки
+        // Во время гонки скрываем все кнопки
         SetButtonStates(showStart: false, showRetry: false);
     }
 
@@ -125,7 +125,7 @@ public sealed class RaceUI : MonoBehaviour
 
         SetPanelStates(idle: false, race: false, result: true);
 
-        // ИЗМЕНЕНИЕ: В результатах показываем только кнопку Retry
+        // В результатах показываем только кнопку Retry
         SetButtonStates(showStart: false, showRetry: true);
     }
 
@@ -155,7 +155,7 @@ public sealed class RaceUI : MonoBehaviour
         if (_resultPanel != null) _resultPanel.SetActive(result);
     }
 
-    // НОВЫЙ МЕТОД: Управление видимостью кнопок
+    // Управление видимостью кнопок
     private void SetButtonStates(bool showStart, bool showRetry)
     {
         if (_startButton != null && _startButton.gameObject != null)

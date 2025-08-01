@@ -29,7 +29,7 @@ public sealed class RaceUIPresenter : MonoBehaviour
         var stateMachine = RaceStateMachine.Instance;
         stateMachine.OnStateChanged += OnStateChanged;
 
-        // ИЗМЕНЕНИЕ: Убираем локальный флаг, используем статический из RaceDirector
+        // Убираем локальный флаг, используем статический из RaceDirector
         _ui.OnRetryClicked += OnRetryClicked;
 
         OnStateChanged(stateMachine.Current);
@@ -75,7 +75,7 @@ public sealed class RaceUIPresenter : MonoBehaviour
             return;
         }
 
-        // ИЗМЕНЕНИЕ: Используем статический флаг из RaceDirector
+        // Используем статический флаг из RaceDirector
         Debug.Log($"[RaceUIPresenter] Handling state change: {state} (FirstRace: {RaceDirector.IsFirstRace})");
 
         switch (state)
@@ -87,7 +87,7 @@ public sealed class RaceUIPresenter : MonoBehaviour
                 }
                 else
                 {
-                    _ui.ShowIdle(); // Показываем только кнопку "Retry"
+                    _ui.ShowIdle(); // Показываем только кнопку "Retry" но пока только Start
                 }
                 break;
 

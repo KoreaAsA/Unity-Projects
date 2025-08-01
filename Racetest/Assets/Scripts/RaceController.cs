@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class RaceController : MonoBehaviour
 {
-    [Header("Signal Assets - перетащите из Project")]
-    [SerializeField] private RaceStartedSignal raceStartedSignal;     // Перетащите .asset файл сюда
-    [SerializeField] private RaceFinishedSignal raceFinishedSignal;   // Перетащите .asset файл сюда
-    [SerializeField] private CountdownFinishedSignal countdownSignal;  // Перетащите .asset файл сюда
+    [SerializeField] private RaceStartedSignal raceStartedSignal;     
+    [SerializeField] private RaceFinishedSignal raceFinishedSignal;   
+    [SerializeField] private CountdownFinishedSignal countdownSignal;  
 
     void Start()
     {
-        // Подписываемся на конкретные сигналы
+        // Подписываемся
         raceStartedSignal.AddListener(OnRaceStarted, "RaceController");
         raceFinishedSignal.AddListener(OnRaceFinished, "RaceController");
         countdownSignal.AddListener(OnCountdownFinished, "RaceController");

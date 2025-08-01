@@ -13,7 +13,7 @@ public class FindRaceStateMachine : MonoBehaviour
 
         if (all.Length == 0)
         {
-           // Debug.LogError("❌ НИ ОДНОГО RaceStateMachine в сцене!");
+           // Debug.LogError(" Ни одного RaceStateMachine в сцене!");
         }
     }
 }

@@ -21,10 +21,20 @@ public sealed class RaceDirector : MonoBehaviour
 
     private void Start()
     {
-
         IsFirstRace = true;
 
         Debug.Log("[RaceDirector] Starting race director...");
+
+            // Проверяем состояние траектории при старте
+        if (_trackStorage.IsTrajectoryRecorded)
+        {
+            Debug.Log($"[RaceDirector] First trajectory already exists with {_trackStorage.Frames.Count} frames");
+        }
+        else
+        {
+            Debug.Log("[RaceDirector] No first trajectory yet - will record in this race");
+        }
+
         ValidateComponents();
 
         if (RaceStateMachine.Instance != null)
@@ -116,7 +126,7 @@ public sealed class RaceDirector : MonoBehaviour
         }
 
         CleanupVehicles();
-        //IsFirstRace = false; // ИЗМЕНЕНИЕ: Устанавливаем что это уже не первая гонка
+        //IsFirstRace = false; // Устанавливаем что это уже не первая гонка
         RaceStateMachine.Instance.ChangeState(RaceState.Idle);
     }
 
@@ -124,7 +134,6 @@ public sealed class RaceDirector : MonoBehaviour
     {
         Debug.Log("[RaceDirector] Starting race flow...");
 
-        // 1. Setup Phase
         Debug.Log("[RaceDirector] Phase 1: Setup vehicles");
         bool setupSuccess = SetupRace();
         if (!setupSuccess)
@@ -135,14 +144,12 @@ public sealed class RaceDirector : MonoBehaviour
             yield break;
         }
 
-        // 2. Start racing immediately
         Debug.Log("[RaceDirector] Phase 2: Starting race immediately");
         RaceStateMachine.Instance.ChangeState(RaceState.Racing);
 
         _raceStartedSignal.Raise();
         Debug.Log("[RaceDirector] Race started signal raised immediately");
 
-        // 3. Wait for finish
         Debug.Log("[RaceDirector] Phase 3: Waiting for finish");
         yield return new WaitUntil(() => RaceStateMachine.Instance.Current == RaceState.Finished);
 
@@ -152,15 +159,10 @@ public sealed class RaceDirector : MonoBehaviour
 
     private bool SetupRace()
     {
-        // Сохраняем данные призрака
-        var ghostData = new VehicleSnapshot[_trackStorage.Frames.Count];
-        for (int i = 0; i < _trackStorage.Frames.Count; i++)
-        {
-            ghostData[i] = _trackStorage.Frames[i];
-        }
-        bool hasGhostData = ghostData.Length > 0;
+        // Используем новый метод проверки траектории
+        bool hasGhostData = _trackStorage.IsTrajectoryRecorded;
 
-        // ИЗМЕНЕНИЕ: Спавним игрока с учетом первого заезда
+        // Спавним игрока с учетом первого заезда
         _playerCar = _spawnManager.SpawnPlayer(IsFirstRace);
         if (_playerCar == null)
         {
@@ -179,10 +181,10 @@ public sealed class RaceDirector : MonoBehaviour
         recorder.enabled = true;
         Debug.Log("[RaceDirector] Player recorder enabled");
 
-        // Спавним призрака только если есть данные И это не первая гонка
+        // Спавним призрака если есть ПЕРВАЯ траектория и это НЕ первый заезд
         if (hasGhostData && !IsFirstRace)
         {
-            Debug.Log($"[RaceDirector] Spawning ghost with {ghostData.Length} frames");
+            Debug.Log($"[RaceDirector] Spawning ghost with FIRST trajectory ({_trackStorage.Frames.Count} frames)");
             _ghostCar = _spawnManager.SpawnGhost();
             if (_ghostCar == null)
             {
@@ -197,42 +199,51 @@ public sealed class RaceDirector : MonoBehaviour
                 return false;
             }
 
+            // Загружаем ПЕРВУЮ траекторию
+            var ghostData = new VehicleSnapshot[_trackStorage.Frames.Count];
+            for (int i = 0; i < _trackStorage.Frames.Count; i++)
+            {
+                ghostData[i] = _trackStorage.Frames[i];
+            }
+
             ghost.Load(ghostData);
-            Debug.Log("[RaceDirector] Ghost loaded successfully");
+            Debug.Log("[RaceDirector] Ghost loaded with FIRST trajectory");
         }
         else if (IsFirstRace)
         {
-            Debug.Log("[RaceDirector] First race - no ghost spawned, player at ghost spawn");
+            Debug.Log("[RaceDirector] First race - no ghost spawned, recording trajectory");
         }
         else
         {
-            Debug.Log("[RaceDirector] No ghost data available for subsequent race");
+            Debug.Log("[RaceDirector] No first trajectory available");
         }
 
         return true;
     }
-
     private void OnLapCompleted(float lapTime)
     {
         Debug.Log($"[RaceDirector] Lap completed in {lapTime:F2} seconds");
 
-        if (IsFirstRace)
-        {
-            IsFirstRace = false;
-            Debug.Log("[RaceDirector] First race completed, subsequent races will have ghost");
-        }
         if (_playerCar != null)
         {
             var recorder = _playerCar.GetComponent<Recorder>();
             if (recorder != null)
             {
                 var trajectory = recorder.GetTrajectory();
-                Debug.Log($"[RaceDirector] Saving {trajectory.Count} frames to ghost storage");
 
-                _trackStorage.Clear();
-                foreach (var frame in trajectory)
+                // Сохраняем траекторию только если это первый заезд
+                if (IsFirstRace)
                 {
-                    _trackStorage.Add(frame);
+                    bool saved = _trackStorage.TrySaveFirstTrajectory(trajectory);
+                    if (saved)
+                    {
+                        Debug.Log($"[RaceDirector] FIRST trajectory saved with {trajectory.Count} frames");
+                    }
+                    IsFirstRace = false; // Помечаем что первый заезд завершен
+                }
+                else
+                {
+                    Debug.Log($"[RaceDirector] Subsequent race completed, trajectory NOT saved (using first trajectory with {_trackStorage.Frames.Count} frames)");
                 }
             }
         }
